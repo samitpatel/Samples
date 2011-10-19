@@ -1,0 +1,456 @@
+package edu.nyu.pqs.API;
+
+import java.io.FileNotFoundException;
+import java.io.IOException;
+import java.io.Serializable;
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.Iterator;
+import java.util.Map;
+import java.util.Map.Entry;
+
+import edu.nyu.pqs.API.FileOperations;
+
+/**
+ * @author Samit Patel
+ *
+ */
+
+/**
+ * This class handles all the operation related to the address book. It provides
+ * functions for adding a new contact, removing a contact, searching a contact,
+ * searching a contact field, total number of contacts in address book, iterating
+ * over the contacts and deleting the whole address book.
+ * */
+public class AddressBook {
+
+	
+	/**
+	 * Creates a new contact based on the fields. It provides function for
+	 * equating two contact object, iterating over the contact details and a
+	 * proper string representation of Contact object.
+	 * */
+	@SuppressWarnings("serial")
+	public static class Contact implements Serializable{
+		
+		
+		private String name = null;
+		private String fax = null;
+		private String mobile = null;
+		private String homePhone = null;
+		private String workPhone = null;
+		private String homeAddress = null;
+		private String workAddress = null;
+		private String note = null;
+		private Map<String,String> details = new HashMap<String,String>();
+		
+		/**
+		 * Restricting the users from creating a Contact instant without name.
+		 * */
+		public Contact(){}
+		
+		/**
+		 * Parameterized Constructor that initializes <code>name</code> of Contact
+		 * @param name name of the Contact 
+		 * */
+		public Contact(String name){
+			this.name = name;
+		}
+		
+		/**
+		 * Sets the <code>fax</code> of a Contact.
+		 * @param value Fax number of person
+		 * @return Contact
+		 * */
+		public Contact fax(String value) {
+			this.fax = value;
+			return this;
+		}
+		
+		/**
+		 * Sets the <code>mobile</code> of a Contact.
+		 * @param value Mobile contact number of person
+		 * @return Contact
+		 * */
+		public Contact mobile(String value){
+			this.mobile = value;
+			return this;
+		}
+		
+		/**
+		 * Sets the <code>homePhone</code> of a Contact.
+		 * @param value Home contact number of person
+		 * @return Contact
+		 * */
+		public Contact homePhone(String value) {
+			this.homePhone = value;
+			return this;
+		}
+		
+		/**
+		 * Sets the <code>workPhone</code> of a Contact.
+		 * @param value Work contact number of person
+		 * @return Contact
+		 * */
+		public Contact workPhone(String value) {
+			this.workPhone = value;
+			return this;
+		}
+		
+		/**
+		 * Sets the <code>homeAddress</code> of a Contact.
+		 * @param value Home address of person
+		 * @return Contact
+		 * */
+		public Contact homeAddress(String value) {
+			this.homeAddress = value;
+			return this;
+		}
+		
+		/**
+		 * Sets the <code>workAddress</code> of a Contact.
+		 * @param value Work address of person
+		 * @return Contact
+		 * */
+		public Contact workAddress(String value) {
+			this.workAddress = value;
+			return this;
+		}
+		
+		/**
+		 * Sets the <code>note</code> of a Contact.
+		 * @param value General note of person
+		 * @return Contact
+		 * */
+		public Contact note(String value) {
+			this.note = value;
+			return this;
+		}
+		
+		/**
+		 * Add a new contact into the Address Book. This will not write
+		 * the contact to the file. Function {@link #commitChanges()} has to be
+		 * called explicitly to reflect the changes into the file.
+		 * @throws FileNotFoundException 
+		 * */
+		public void addContact() throws FileNotFoundException {
+		   
+			if(name == null || name == ""){
+				throw new IllegalArgumentException("Please specify a name for " +
+																	"this contact");
+			}
+			details.put("name",this.name);
+		    details.put("fax",this.fax);
+		    details.put("mobile",this.mobile);
+		    details.put("workPhone",this.workPhone);
+		    details.put("homePhone",this.homePhone);
+		    details.put("workAddress",this.workAddress);
+		    details.put("homeAddress",this.homeAddress);
+		    details.put("note",this.note);
+		   
+			FileOperations.addContact(name,this);
+		}
+		
+		/**
+		 * Returns the name of the contact.
+		 * @return name of the contact.
+		 * */
+		public String getName() {
+			return name;
+		}
+		
+		/**
+		 * Returns fax contact number of the contact.
+		 * @return fax number of the contact.
+		 * */
+		public String getFax() {
+			return fax;
+		}
+
+		/**
+		 * Returns the mobile contact number of the contact.
+		 * @return mobile number of the contact.
+		 * */
+		public String getMobile() {
+			return mobile;
+		}
+
+		/**
+		 * Returns the home contact number of the contact.
+		 * @return home contact number of the contact.
+		 * */
+		public String getHomePhone() {
+			return homePhone;
+		}
+
+		/**
+		 * Returns the work contact number of the contact.
+		 * @return work contact number of the contact.
+		 * */
+		public String getWorkPhone() {
+			return workPhone;
+		}
+		
+		/**
+		 * Returns the home address of the contact.
+		 * @return home address of the contact.
+		 * */
+		public String getHomeAddress() {
+			return homeAddress;
+		}
+		
+		/**
+		 * Returns the work address of the contact.
+		 * @return home work of the contact.
+		 * */
+		public String getWorkAddress() {
+			return workAddress;
+		}
+
+		/**
+		 * Returns the note written by the contact.
+		 * @return note of the contact.
+		 * */
+		public String getNote() {
+			return note;
+		}
+		
+		/**
+		 * Returns a {@link Map} which maps each contact field to its value.
+		 * @return details of the contact.
+		 * */
+		public Map<String,String> getDetails(){
+			return Collections.unmodifiableMap(details);
+		}
+		
+		/**
+		 * Returns the iterator object for this contact. Iterator iterates over
+		 * {@link Entry} which maps the field to its value for a single Contact.
+		 * */
+		public Iterator<Entry<String,String>> getIterator() {
+			return new iterator();
+		}
+		
+		
+		@Override
+		public int hashCode() {
+			final int prime = 31;
+			int result = 1;
+			result = prime * result + ((fax == null) ? 0 : fax.hashCode());
+			result = prime * result
+					+ ((homeAddress == null) ? 0 : homeAddress.hashCode());
+			result = prime * result
+					+ ((homePhone == null) ? 0 : homePhone.hashCode());
+			result = prime * result
+					+ ((mobile == null) ? 0 : mobile.hashCode());
+			result = prime * result + ((name == null) ? 0 : name.hashCode());
+			result = prime * result + ((note == null) ? 0 : note.hashCode());
+			result = prime * result
+					+ ((workAddress == null) ? 0 : workAddress.hashCode());
+			result = prime * result
+					+ ((workPhone == null) ? 0 : workPhone.hashCode());
+			return result;
+		}
+
+		@Override
+		public boolean equals(Object obj) {
+			if (this == obj)
+				return true;
+			if (obj == null)
+				return false;
+			if (getClass() != obj.getClass())
+				return false;
+			Contact other = (Contact) obj;
+			if (fax == null) {
+				if (other.fax != null)
+					return false;
+			} else if (!fax.equals(other.fax))
+				return false;
+			if (homeAddress == null) {
+				if (other.homeAddress != null)
+					return false;
+			} else if (!homeAddress.equals(other.homeAddress))
+				return false;
+			if (homePhone == null) {
+				if (other.homePhone != null)
+					return false;
+			} else if (!homePhone.equals(other.homePhone))
+				return false;
+			if (mobile == null) {
+				if (other.mobile != null)
+					return false;
+			} else if (!mobile.equals(other.mobile))
+				return false;
+			if (note == null) {
+				if (other.note != null)
+					return false;
+			} else if (!note.equals(other.note))
+				return false;
+			if (workAddress == null) {
+				if (other.workAddress != null)
+					return false;
+			} else if (!workAddress.equals(other.workAddress))
+				return false;
+			if (workPhone == null) {
+				if (other.workPhone != null)
+					return false;
+			} else if (!workPhone.equals(other.workPhone))
+				return false;
+			if (name == null) {
+				if (other.name != null)
+					return false;
+			} else if (!name.equals(other.name))
+				return false;
+			return true;
+		}
+
+		/**
+		 * Prints the the contact in string representation.
+		 * */
+		@Override
+		public String toString() {
+			return "Contact [name=" + name + ", fax=" + fax + ", mobile="
+					+ mobile + ", homePhone=" + homePhone + ", workPhone="
+					+ workPhone + ", homeAddress=" + homeAddress
+					+ ", workAddress=" + workAddress + ", note=" + note + "]";
+		}
+		
+		
+		
+		
+		/**
+		 * Class provides an iterator over the details of a single Contact.
+		 * It iterates over Contact and returns {@link Entry} which is 
+		 * mapping of the field to its value.
+		 * */
+		private class iterator implements Iterator<Entry<String,String>>{
+		
+			private Iterator<Entry<String,String>> contactDetailsIterator;
+			
+			private iterator(){
+				this.contactDetailsIterator = details.entrySet().iterator();
+			}	
+			@Override
+			public boolean hasNext() {
+				return contactDetailsIterator.hasNext();
+			}
+
+			@Override
+			public Entry<String,String> next() {
+				Map.Entry<String, String> pair = 
+						(Map.Entry<String,String>)contactDetailsIterator.next();
+				return pair;
+			}
+
+			@Override
+			public void remove() {
+				throw new UnsupportedOperationException(
+											"Remove is not supported");
+			}
+		}
+		
+		
+	}
+	
+	/**
+	 * Initialize the file where the address book is stored. If the file
+	 * don't exists, it'll create one. Otherwise it'll load the address book
+	 * from the file into the Map.The contacts are stored in Map and the Map 
+	 * object is stored in this file.
+	 * @param path The path to file.
+	 * @throws IOException 
+	 * */
+	public static void initializeFile(String path) throws IOException{
+		FileOperations.initializeFile(path);
+	}
+	
+	/**
+	 * Deletes the file where the address book is stored. 
+	 * @throws IOException 
+	 * */
+	public static boolean deleteAddressBook() throws IOException{
+		return FileOperations.deleteAddressBook();
+	}
+	
+	/**
+	 * Commits the changes to the file. One has to call this function explicitly
+	 * to reflect any changes made to address book into the file initialized 
+	 * using function {@link #initializeFile(String)}.
+	 * @return <code>true</code> on successful commit, otherwise <code>false</code>.
+	 * @throws FileNotFoundException if file is not initialized
+	 * */
+	public static boolean commitChanges() throws FileNotFoundException{
+		return FileOperations.commitChanges();
+	}
+	
+	
+	/**
+	 * Modifies the passed Contact in the Address Book. Function 
+	 * {@link #commitChanges()} has to be
+	 * called explicitly to reflect the changes into the file.
+	 * @param name Name of Contact to be removed
+	 * @param modifiedDetails new contact object with new field values.
+	 * @return <code>true</code> if contact is successfully modified in Map,
+	 * 	 otherwise <code>false</code>
+	 * @throws FileNotFoundException if file is not initialized
+	 * */
+	public static boolean modifyContact(String name, Contact modifiedDetails)
+													throws FileNotFoundException{
+		return FileOperations.modifyContact(name, modifiedDetails);	
+	}
+	
+	
+	/**
+	 * Removes the passed Contact from the Address Book. Function 
+	 * {@link #commitChanges()} has to be
+	 * called explicitly to reflect the changes into the file.
+	 * @param name Name of Contact to be removed
+	 * @return <code>true</code> if contact is successfully removed from Map,
+	 * 	 otherwise <code>false</code>
+	 * @throws FileNotFoundException if file is not initialized
+	 * */
+	public static boolean removeContact(String name) throws FileNotFoundException{
+		return FileOperations.removeContact(name);	
+	}
+	
+	/**
+	 * Searches the Address Book for a field under the Contact.
+	 * @param name Name of the contact
+	 * @param field Field to search.
+	 * @return field value under the contact
+	 * @throws FileNotFoundException if file is not initialized.
+	 * */
+	public static String search(String name, String field) throws FileNotFoundException{
+		return FileOperations.search(name,field);	
+	}
+	
+	/**
+	 * Searches the Address Book for a Contact.
+	 * @param name Name of the contact
+	 * @return String representation of Contact
+	 * @throws FileNotFoundException.class if file is not initialized.
+	 * */
+	public static String search(String name) throws FileNotFoundException{
+		return FileOperations.search(name);	
+	}
+	
+	/**
+	 * Returns the general iterator to Address Book which also iterates over null's.
+	 * @return address book
+	 * @throws FileNotFoundException if file is not initialized.
+	 * */
+	public static <T> Iterator<Contact> iterator() throws FileNotFoundException{
+		return FileOperations.getIterator();	
+	}
+	
+	/**
+	 * Returns the total number of contact in address book.
+	 * @return total number of contacts
+	 * @throws FileNotFoundException 
+	 * @throws FileNotFoundException if file is not initialized.
+	 * */
+	public static int getTotalContacts() throws FileNotFoundException{
+		return FileOperations.getTotalContacts();
+	}
+	
+}

@@ -1,0 +1,68 @@
+Please enter your code review in this file as plain text
+and make sure to include it when you commit your project.
+
+1) I would suggest the use of interface instead of abstract class due to 
+various reasons as mentioned in Item 18 in Effective Java book.
+
+
+2) As getNextPlayerMove() method in Player.java is not used by HumanPlayer,
+ this method should be removed from abstract class and kept in 
+ SmartComputerPlayer class. And the execution of block of lines from 
+ 113 to 117 in Board.java should be guarded by a check whether the current 
+ player is computer. If this is not done than the program may fail giving 
+ a NullPointerException when Point instance returned by call of this method 
+ by a human player is used.
+
+ 
+ 3) In Board.java, author is calling the methods getWidth(), getHeight() and 
+ getCurrentPlayer() which returns the value of variables defined in the class 
+ itself. According to me using the variable value directly rather than getting
+ value through a function will be more efficient.
+
+ 
+ 4) The method winner() at line 220 in Board.java is implemented such that 
+ there is no scope of modifying few lines and be able to check it for more 
+ than 3 dimensions. Instead whole new method is to be implemented to 
+ generalize it.
+
+ 
+ 5) I think so methods winner() and tied() in Board.java can be combined into
+ one to improve efficiency. As tied() method returns value depending on return 
+ value of winner() and step variable (Line 206 in Board.java). And winner()
+ and tied() are called the same number of times. winner() call is followed by
+ tied() (Lines 99 and 106 in Board.java). 
+ So i would suggested combining these two methods and setting boolean 
+ variables like 'isWinner' and 'isTied' and check this variables. This would
+ reduce the number of calls to winner() method. This would increase the 
+ efficiency to greater factor when the dimensions are large.
+
+ 
+ 6) There are many object creations that are not used due to change of reference.
+ 
+ BoardDisplay.java
+ LINE 15 : 	creates a new Board object referenced by variable 'board' but then 
+ 			this variable changes the reference to other Board object at Line 22.
+ 
+ LINE 65 : 	creates a new Board object referenced by variable 'newboard' which 
+ 			changes reference to other Board object at Line 67.
+ 			
+ 
+ 7)  There is lot of use of 'null' check to drive the execution. According to me
+ 'null' should not be used in this way. Line 115 in Board.java, 73, 78 and 83 in
+ BoardDisplay.java.
+ 
+ 
+ 8) In Token.java line 22, symbol is set to 'null'. I suggest to use any indicator
+ like '-' to denote the absence of symbol. Because using null could lead to 
+ NullPointerException.
+ 
+ 
+ 9) Validity checks are missing in deleteListener(), fireMovePerformedEvent(), 
+ startPlay(), setToken(), movePerformed() methods.
+ 
+ 
+ 10) deleteListener() and reset() methods are never used.
+ 
+ 
+ 11) The Javadoc of method addGameListener() at Line 188 in Board.java should 
+ indicate @throws NullPointerException. 
